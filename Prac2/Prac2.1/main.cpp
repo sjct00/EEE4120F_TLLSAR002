@@ -39,7 +39,7 @@ int main(void)
     
 	//TODO code 1: select the platform you wish to use
 	//Select the platform you would like to use in this program (change index to do this). If you would like to see all available platforms run platform.cpp.
-	
+	cl_platform_id platform = platforms[0];
 	
 	//Outputs the information of the chosen platform
 	char* Info = (char*)malloc(0x1000*sizeof(char));
@@ -67,7 +67,11 @@ int main(void)
 	/* Access a device */
 	//The if statement checks to see if the chosen platform uses a GPU, if not it setups the device using the CPU
 	//TODO code 2: select your device
-	
+	err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
+	if (err == CL_DEVICE_NOT_FOUND) {
+			err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_CPU, 1, &device, NULL);
+	}
+	printf("Device ID = %i\n", err);
 
 	//------------------------------------------------------------------------
 	
@@ -85,7 +89,7 @@ int main(void)
 	//read file in	
 	FILE *program_handle;
 	//TODO code 4: select the directory of the file that contains the kernel
-	
+	program_handle = fopen("OpenCL/Kernel.cl", "r");
 
 	//get program size
 	size_t program_size;//, log_size;
@@ -110,7 +114,7 @@ int main(void)
 	//						cl_int *errcode_ret)	
 	
 	//TODO code 5: create the .cl program from the source code 
-	
+	cl_program program = clCreateProgramWithSource(context, 1, (const char**)&program_buffer, &program_size, NULL);
 
 	//------------------------------------------------------------------------
 
@@ -123,7 +127,7 @@ int main(void)
 	//		void* user_data);
 	
 	//TODO code 6: compile the source code obtained in step 5
-	
+	cl_int err3 = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
 	printf("program ID = %i\n", err3);
 	
 	//------------------------------------------------------------------------
@@ -133,7 +137,7 @@ int main(void)
 	//			const char* kernel_name,
 	//			cl_int* errcode_ret);
 	//TODO code 7: create the kernel
-	
+	cl_kernel kernel = clCreateKernel(program, "HelloWorld", &err);
 
 	//------------------------------------------------------------------------
 	
@@ -144,13 +148,16 @@ int main(void)
 	//						cl_int *errcode_ret)
 	
 	//TODO code 8: create the queue
-	
+	cl_command_queue queue = clCreateCommandQueueWithProperties(context, device, 0, NULL);
 
 	//------------------------------------------------------------------------
 
 	//***Step 9*** create data buffers for memory management between the host and the target device
 	//TODO code 9.1: set the number of work items, size of the work items and determine the number of work groups
-	
+	size_t global_size = 16; //total number of work items
+	size_t local_size = 4; //size of each work group
+	cl_int num_groups = global_size/local_size;
+
 	int argument1 = 10; //argument 1 that has to be sent to the target device
 	int argument2 = 20; //argument 2 that has to be sent to the target device
 	int output[global_size]; //output array
@@ -164,7 +171,7 @@ int main(void)
 	//			cl_int* errcode_ret);
 	
 	//TODO code 9.2: Create the buffer for argument 1
-	
+	argument1_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), &argument1, &err);
 	argument2_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), &argument2, &err);
 	
 	output_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, global_size*sizeof(int), output, &err);
@@ -178,7 +185,9 @@ int main(void)
 	//				size_t arg_size, 
 	//				const void *arg_value)
 	//TODO code 10: create the arguments for the kernel
-	
+	clSetKernelArg(kernel, 0, sizeof(cl_mem), &argument1_buffer);
+	clSetKernelArg(kernel, 1, sizeof(cl_mem), &argument2_buffer);
+	clSetKernelArg(kernel, 2, sizeof(cl_mem), &output_buffer);
 
 	//------------------------------------------------------------------------
 
@@ -194,14 +203,14 @@ int main(void)
 	//					const cl_event *event_wait_list, 
 	//					cl_event *event)
 	//TODO code 11: deploy kernel and set work groups
-         	 	
+    cl_int err4 = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_size, &local_size, 0, NULL, NULL);     	 	
 	printf("\nKernel check: %i \n",err4);
 
 	//------------------------------------------------------------------------
 
 	//***Step 12*** Allows the host to read from the buffer object 
 	//TODO code 12: read the output values from the output buffer
-	
+	err = clEnqueueReadBuffer(queue, output_buffer, CL_TRUE, 0, sizeof(output), output, 0, NULL, NULL);
 	
 	
 	//***Step 13*** Check that the host was able to retrieve the output data from the output buffer
