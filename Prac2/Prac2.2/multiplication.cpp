@@ -323,15 +323,15 @@ int main(void)
 	
 	//***Step 13*** Check that the host was able to retrieve the output data from the output buffer
 	
-	// if(displayMatrices){
-	// 	printf("\nOutput in the output_buffer \n");
-	// 	for(int j=0; j<countA; j++) {
-	// 		printf("%i \t " ,output[j]);
-	// 		if(j%Size == (Size-1)){
-	// 			printf("\n");
-	// 		}
-	// 	}
-	// }
+	if(displayMatrices){
+		printf("\nOutput in the output_buffer \n");
+		for(int j=0; j<countA; j++) {
+			printf("%i \t " ,output[j]);
+			if(j%Size == (Size-1)){
+				printf("\n");
+			}
+		}
+	}
 	
 	
 	//------------------------------------------------------------------------

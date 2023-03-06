@@ -11,26 +11,25 @@ __kernel void matrixMultiplication(__global int* matrixA, __global int* matrixB,
 	
 	//memory buffers
 	int size = *Size;
-	int result[size];
 
 	//determine index to use for 1D matrix
 	int indexA = workGroupNum/size + localGroupID;
 	int indexB = localGroupID*size + workGroupNum%size;
 
-	printf("A:%i B:%i \n",indexA,indexB);
+	//printf("wg:%i wi:%i\n",indexA,indexB);
 
 	int A = matrixA[indexA];
 	int B = matrixB[indexB];
 	//printf("A:%i B:%i",A,B);
 	
 	
+	local int result[100];
 	
-	/*
 	//calculation
 	int res = A*B;
-	printf("%i\n",res);
-	/*
-	result[localGroupID] = A*B;	
+	//printf("%i\n",res);
+	
+	result[localGroupID] = res;	
 	
 
 	//barrier that stops all work items here until all work items in the work group have executed this function
@@ -42,10 +41,10 @@ __kernel void matrixMultiplication(__global int* matrixA, __global int* matrixB,
 		{
 			groupValue += result[i];
 		}
-	
-		printf(groupValue);
+		//printf("%i\n",groupValue);
+		output[workGroupNum] = groupValue;
 	}
-	output[workItemNum] = result[localGroupID];*/
+	
 	
 }
 
