@@ -319,13 +319,17 @@ int main(void)
 	
 	//This command stops the program here until everything in the queue has been run
 	clFinish(queue);
+
+
+	//Sarah tries stuff
 	matrixB_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, countB*sizeof(int), &output, &err);
 
 	clSetKernelArg(kernel, 0, sizeof(cl_mem), &matrixB_buffer);
 	clSetKernelArg(kernel, 1, sizeof(cl_mem), &matrixA_buffer);
 
-	cl_int err4 = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_size, &local_size, 0, NULL, NULL); 
-	printf("\nKernel check: %i \n",err4);
+	cl_int err5 = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_size, &local_size, 0, NULL, NULL); 
+	printf("\nKernel check: %i \n",err5);
+
 	clFinish(queue);
 	
 	//***Step 13*** Check that the host was able to retrieve the output data from the output buffer
