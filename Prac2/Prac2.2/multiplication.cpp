@@ -329,7 +329,7 @@ int main(void)
 
 	cl_int err5 = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_size, &local_size, 0, NULL, NULL); 
 	printf("\nKernel check: %i \n",err5);
-
+	err = clEnqueueReadBuffer(queue, output_buffer, CL_TRUE, 0, sizeof(output), output, 0, NULL, NULL);
 	clFinish(queue);
 	
 	//***Step 13*** Check that the host was able to retrieve the output data from the output buffer
