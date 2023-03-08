@@ -256,7 +256,7 @@ int main(void)
 	cl_int num_groups = global_size/local_size; //number of work groups needed
 	//already got matrixA and matrixB
 	//TODO: initialize the output array
-	int output[global_size]; //output array
+	int output[num_groups]; //output array
    
 
 	
@@ -271,7 +271,7 @@ int main(void)
 	matrixA_buffer = clCreateBuffer(context,CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, countA*sizeof(int), &matrixA, &err);
 	matrixB_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, countB*sizeof(int), &matrixB, &err);
 	size_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), &Size, &err);
-	output_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, global_size*sizeof(int), output, &err);
+	output_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, num_groups*sizeof(int), &output, &err);
 
 	//------------------------------------------------------------------------
 
